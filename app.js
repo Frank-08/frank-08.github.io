@@ -27,7 +27,7 @@
   };
 
   /* ---------------- State ---------------- */
-  var state = { done: {}, screen: 0, best: null, passed: false, attested: false, attempts: 0 };
+  var state = { done: {}, screen: 0, best: null, passed: false, labDone: false, attested: false, attempts: 0 };
   var startTime = new Date();
 
   function save() {
@@ -55,6 +55,7 @@
   var SCREENS = [{ type: "welcome", title: "Welcome" }, { type: "primer", title: "What is privileged access?" }];
   MODULES.forEach(function (m, i) { SCREENS.push({ type: "module", title: m.title, mod: m, num: i + 1 }); });
   SCREENS.push({ type: "exam", title: "Final exam" });
+  SCREENS.push({ type: "lab", title: LAB.title });
   SCREENS.push({ type: "attest", title: "Attestation" });
   SCREENS.push({ type: "finish", title: "Course complete" });
 
@@ -69,8 +70,9 @@
       return prev.type === "primer" ? introDone() : !!state.done[prev.mod.id];
     }
     if (s.type === "exam") return modulesDone();
-    if (s.type === "attest") return state.passed;
-    if (s.type === "finish") return state.passed && state.attested;
+    if (s.type === "lab") return state.passed;
+    if (s.type === "attest") return state.passed && state.labDone;
+    if (s.type === "finish") return state.passed && state.labDone && state.attested;
     return false;
   }
   function isComplete(i) {
@@ -79,8 +81,9 @@
     if (s.type === "primer") return !!state.done.primer;
     if (s.type === "module") return !!state.done[s.mod.id];
     if (s.type === "exam") return state.passed;
+    if (s.type === "lab") return state.labDone;
     if (s.type === "attest") return state.attested;
-    if (s.type === "finish") return state.passed && state.attested;
+    if (s.type === "finish") return state.passed && state.labDone && state.attested;
   }
 
   var $ = function (id) { return document.getElementById(id); };
@@ -100,10 +103,10 @@
     Array.prototype.forEach.call(document.querySelectorAll(".nav-item"), function (b) {
       b.onclick = function () { go(parseInt(b.getAttribute("data-i"), 10)); closeMenu(); };
     });
-    var total = MODULES.length + 4, n = 0;
+    var total = MODULES.length + 5, n = 0;
     if (state.done.welcome) n++; if (state.done.primer) n++;
     MODULES.forEach(function (m) { if (state.done[m.id]) n++; });
-    if (state.passed) n++; if (state.attested) n++;
+    if (state.passed) n++; if (state.labDone) n++; if (state.attested) n++;
     var pct = Math.round(n / total * 100);
     $("progress-fill").style.width = pct + "%";
     $("progress-text").textContent = pct + "% complete";
@@ -126,7 +129,7 @@
     if (i < 0 || i >= SCREENS.length || !isUnlocked(i)) return;
     state.screen = i; save();
     var s = SCREENS[i], main = $("content");
-    ({ welcome: rWelcome, primer: rPrimer, module: rModule, exam: rExam, attest: rAttest, finish: rFinish })[s.type](s, i, main);
+    ({ welcome: rWelcome, primer: rPrimer, module: rModule, exam: rExam, lab: rLab, attest: rAttest, finish: rFinish })[s.type](s, i, main);
     renderNav();
     try { main.focus({ preventScroll: true }); } catch (e) { main.focus(); }
     main.scrollTop = 0; window.scrollTo(0, 0);
@@ -260,6 +263,44 @@
           "<button class='btn btn-secondary' id='review'>Review modules</button><button class='btn btn-primary' id='retake'>Retake exam</button>") + "</div>";
       if (pass) $("to-attest").onclick = function () { go(i + 1); };
       else { $("retake").onclick = function () { runExam(i, el); }; $("review").onclick = function () { go(2); }; }
+    };
+  }
+
+  /* ---------------- Hands-on lab ---------------- */
+  function rLab(s, i, el) {
+    var stepsHtml = LAB.steps.map(function (st) {
+      return "<div class='point'><h3>" + esc(st[0]) + "</h3><div>" + st[1] + "</div></div>";
+    }).join("");
+    var consoleHtml = LAB.consoleUrl
+      ? "<p><a class='btn btn-primary' href='" + esc(LAB.consoleUrl) + "' target='_blank' rel='noopener'>Open the lab console &rarr;</a></p>"
+      : "<p class='note'>Your trainer will provide the console link and your personal login for this exercise.</p>";
+    var takeaways = LAB.takeaways.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+    var done = state.labDone;
+    el.innerHTML =
+      "<p class='eyebrow'>Practical exercise</p><h1>" + esc(LAB.title) + "</h1>" +
+      "<p class='lead'>" + esc(LAB.intro) + "</p>" +
+      "<div class='card accent'><h2>Access the lab</h2>" + consoleHtml + "</div>" +
+      "<h2>Steps</h2><div class='points'>" + stepsHtml + "</div>" +
+      "<div class='card'><h2>Takeaways</h2><ul class='ticks'>" + takeaways + "</ul></div>" +
+      "<section class='check' aria-labelledby='flag-h'><p class='eyebrow'>Prove it</p><h2 id='flag-h'>Enter the flag from FINAL.txt</h2>" +
+      "<input type='text' id='flag-input' class='flag-input'" + (done ? " disabled value='" + esc(LAB.flag) + "'" : " placeholder='FLAG-...'") + " autocomplete='off' spellcheck='false'>" +
+      (done ? "" : "<div><button class='btn btn-primary' id='flag-submit'>Submit flag</button></div>") +
+      "<div id='flag-fb' class='feedback' aria-live='polite'></div></section>" +
+      footer(i, isUnlocked(i + 1), "Continue");
+    wireFooter(i);
+    if (done) { $("flag-fb").className = "feedback ok"; $("flag-fb").innerHTML = "<strong>Flag accepted.</strong> Lab exercise complete."; return; }
+    $("flag-submit").onclick = function () {
+      var val = ($("flag-input").value || "").trim();
+      var fb = $("flag-fb");
+      if (!val) { fb.className = "feedback warn"; fb.textContent = "Enter the flag you found in FINAL.txt."; return; }
+      if (val === LAB.flag) {
+        fb.className = "feedback ok"; fb.innerHTML = "<strong>Correct.</strong> Lab exercise complete.";
+        state.labDone = true; save(); renderNav(); refreshNext(i);
+        $("flag-input").setAttribute("disabled", "disabled");
+        var btn = $("flag-submit"); if (btn) btn.parentNode.removeChild(btn);
+      } else {
+        fb.className = "feedback bad"; fb.textContent = "That doesn't match. Check FINAL.txt on app01 and try again.";
+      }
     };
   }
 

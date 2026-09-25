@@ -72,6 +72,11 @@ fieldset{border:0;margin:0;padding:0}
 .contacts{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .contact a{color:var(--blue);font-weight:600;word-break:break-all}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.point pre,.card pre{background:#0f1d38;color:#cfe0ff;border-radius:6px;padding:12px 14px;overflow-x:auto;font-family:Consolas,Monaco,monospace;font-size:.85rem;margin:.6em 0;white-space:pre-wrap;word-break:break-word}
+.point code,.card code,.lead code{background:#eef3fb;color:var(--blue);border-radius:4px;padding:1px 6px;font-family:Consolas,Monaco,monospace;font-size:.9em}
+.flag-input{display:block;font:inherit;font-family:Consolas,Monaco,monospace;font-size:1.05rem;padding:10px 14px;border:1px solid var(--line);border-radius:6px;width:100%;max-width:420px;margin:14px 0}
+.flag-input:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.flag-input:disabled{background:#e7f5ec;color:var(--ok);font-weight:700;border-color:var(--ok)}
 @media (max-width:860px){
  .menu-btn{display:block}.progress{display:none}.topbar{gap:10px;padding:8px 12px}.logo{height:48px}.topbar-title span{display:none}
  .sidebar{position:fixed;left:-310px;top:76px;z-index:4;transition:left .25s;box-shadow:2px 0 12px rgba(0,0,0,.15)}

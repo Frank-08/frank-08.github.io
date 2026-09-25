@@ -5,6 +5,12 @@
    VIDEO LINKS: paste a SharePoint / Stream EMBED URL between the quotes
    in "video" for each module. Leave it empty ("") to show the
    placeholder panel. Nothing else needs to change.
+   ---------------------------------------------------------------------
+   HANDS-ON LAB: see the LAB block below. Paste the console URL for
+   this training run into "consoleUrl" (leave empty to show a "your
+   trainer will provide this" note instead). "flag" is the exact value
+   learners must type in to pass this step - update it here only, it
+   does not need to change anywhere else.
    ===================================================================== */
 
 var COURSE = {
@@ -367,3 +373,32 @@ var ATTESTATION = [
   "I will follow Council policies and procedures, and speak up when I see unsafe practices.",
   "I will promptly report suspected security incidents or suspicious requests to the IT Service Desk and follow the guidance I'm given."
 ];
+
+/* ---------------------------------------------------------------------
+   HANDS-ON LAB - "Follow the Attacker". consoleUrl: paste the link for
+   this training run (leave "" to show a placeholder note). flag: the
+   exact value learners must enter to complete this step.
+   --------------------------------------------------------------------- */
+var LAB = {
+  title: "Hands-on: Follow the Attacker",
+  consoleUrl: "",
+  flag: "FLAG-LAB-COMPLETE-7CPYG6K",
+  intro: "The modules covered how attackers think. Now do it yourself, against a safe, self-contained practice environment built for this course. Nothing here is a real system - every account, password and \"vulnerability\" is synthetic and exists only inside this lab.",
+  steps: [
+    ["1. Access the lab", "Open the console link above and sign in with the login your trainer gave you. You'll land directly in a terminal on the attacker machine - no setup required."],
+    ["2. Find the web server", "Scan the lab network to find the exposed service:<pre>nmap -sV 10.50.10.0/24</pre>Look for the host with TCP port 8080 open - this is web01 (10.50.10.25 in the default lab instance; your trainer will confirm the address if yours differs)."],
+    ["3. Inspect the application", "<pre>curl http://10.50.10.25:8080/\ncurl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=help\"</pre>"],
+    ["4. Exploit the guided flaw", "Run a harmless identity command, then read the staged support note:<pre>curl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=whoami\"\ncurl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=read-support-note\"</pre>Record the returned <code>websupport</code> password."],
+    ["5. Use the recovered credentials", "<pre>ssh websupport@10.50.10.25\ncat README.txt</pre>Accept the host key and enter the recovered password. README.txt gives the APP01 username and a password hash - it needs cracking before you can use it."],
+    ["6. Crack the recovered hash", "Copy the hash into a file on the attacker host and run a dictionary attack against it:<pre>echo '&lt;paste the hash here&gt;' &gt; hash.txt\nhashcat -m 0 -a 0 hash.txt /usr/share/wordlists/common.txt</pre>This recovers the plain-text APP01 password in seconds."],
+    ["7. Move to the internal server", "From your web01 session:<pre>ssh authority_sync@app01\ncat FINAL.txt</pre>FINAL.txt contains the completion flag - enter it below."]
+  ],
+  takeaways: [
+    "Discover an exposed service.",
+    "Exploit one weakness.",
+    "Use access to find credentials.",
+    "Crack a weak or reused password hash offline.",
+    "Reuse credentials to reach another system.",
+    "Several small gaps can form a complete attack path."
+  ]
+};
