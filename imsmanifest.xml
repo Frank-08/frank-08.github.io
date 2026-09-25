@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="BCC_PUT_2026" version="1.0"
+  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+  <organizations default="BCC_ORG">
+    <organization identifier="BCC_ORG">
+      <title>Privileged User Training (PUT) - Bayside City Council</title>
+      <item identifier="ITEM_PUT" identifierref="RES_PUT" isvisible="true">
+        <title>Privileged User Training (PUT)</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="RES_PUT" type="webcontent" adlcp:scormtype="sco" href="index.html">
+      <file href="index.html"/>
+      <file href="style.css"/>
+      <file href="content.js"/>
+      <file href="app.js"/>
+      <file href="assets/bayside-logo.jpg"/>
+    </resource>
+  </resources>
+</manifest>
