@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEST HARNESS | Privileged User Training</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  #dev-banner{position:sticky;top:0;z-index:999;background:#b91c1c;color:#fff;
+    font:600 13px/1.4 system-ui,sans-serif;text-align:center;padding:7px 10px}
+  #dev-banner code{background:rgba(255,255,255,.18);padding:1px 6px;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="dev-banner">TEST HARNESS - jumps straight to a screen for quick checks.
+  Use <code>?screen=lab</code> / <code>exam</code> / <code>attest</code> / <code>finish</code> in the URL
+  (defaults to <code>lab</code>). Not part of the course - never include this file in the packaged SCORM zip.</div>
+<header class="topbar">
+  <button id="menu-btn" class="menu-btn" aria-controls="sidebar" aria-expanded="false" aria-label="Course menu">&#9776;</button>
+  <img src="assets/bayside-logo.jpg" alt="Bayside City Council" class="logo">
+  <div class="topbar-title"><strong>Privileged User Training</strong><span>Cyber security for privileged users</span></div>
+  <div class="progress" aria-hidden="true"><div class="progress-bar"><div id="progress-fill"></div></div><span id="progress-text">0% complete</span></div>
+</header>
+<div class="layout">
+  <nav id="sidebar" class="sidebar" aria-label="Course contents"><div id="nav"></div></nav>
+  <main id="content" class="content" tabindex="-1"></main>
+</div>
+<script src="content.js"></script>
+<script>
+  // Seed a clean, fully-repeatable state so the app lands directly on the
+  // requested screen every time this file is opened - no manual click-through
+  // needed. Re-run with a different ?screen= value, or delete
+  // localStorage["put_bayside_state"] to go back to a real cold start.
+  (function () {
+    var target = new URLSearchParams(location.search).get("screen") || "lab";
+    var order = { welcome: 0, primer: 1, exam: 10, lab: 11, attest: 12, finish: 13 };
+    var screenIndex = order.hasOwnProperty(target) ? order[target] : 11;
+
+    var done = { welcome: true, primer: true };
+    MODULES.forEach(function (m) { done[m.id] = true; });
+
+    var seeded = {
+      done: done,
+      screen: screenIndex,
+      best: 100,
+      passed: screenIndex >= 10,
+      labDone: screenIndex >= 12,
+      attested: screenIndex >= 13,
+      attempts: 1
+    };
+    localStorage.setItem("put_bayside_state", JSON.stringify(seeded));
+  })();
+</script>
+<script src="app.js"></script>
+</body>
+</html>
