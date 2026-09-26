@@ -381,7 +381,7 @@ var ATTESTATION = [
    --------------------------------------------------------------------- */
 var LAB = {
   title: "Hands-on: Follow the Attacker",
-  consoleUrl: "",
+  consoleUrl: "http://192.168.5.69:8090/guacamole/",
   flag: "FLAG-LAB-COMPLETE-7CPYG6K",
   intro: "The modules covered how attackers think. Now do it yourself, against a safe, self-contained practice environment built for this course. Nothing here is a real system - every account, password and \"vulnerability\" is synthetic and exists only inside this lab.",
   steps: [
